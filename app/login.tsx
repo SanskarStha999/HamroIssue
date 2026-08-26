@@ -1,7 +1,9 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -16,8 +18,28 @@ export default function LoginScreen() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    console.log("Logging in with", identifier, password);
+  const handleLogin = async () => {
+    if (!identifier || !password) {
+      Alert.alert("Missing info", "Please enter both fields.");
+      return;
+    }
+
+    try {
+      const existingUsersRaw = await AsyncStorage.getItem("users");
+      const users = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
+
+      const match = users.find(
+        (u: any) => u.identifier === identifier && u.password === password,
+      );
+
+      if (match) {
+        router.replace("/home");
+      } else {
+        Alert.alert("Login failed", "Incorrect phone/email or password.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    }
   };
 
   return (
