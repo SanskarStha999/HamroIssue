@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import IssuesMap from "../components/IssuesMap";
 
 const issues = [
   {
@@ -51,6 +52,7 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {/* Map placeholder */}
       <View style={styles.mapPlaceholder}>
+        <IssuesMap />
         <View style={styles.searchBar}>
           <Ionicons name="search" size={18} color="#888" />
           <TextInput
@@ -63,7 +65,6 @@ export default function HomeScreen() {
         <TouchableOpacity style={styles.bellButton}>
           <Ionicons name="notifications-outline" size={20} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.mapPlaceholderText}>Map view coming soon</Text>
       </View>
 
       {/* Bottom sheet */}
@@ -173,6 +174,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingBottom: 20,
   },
+
+  compassBadge: {
+    position: "absolute",
+    top: 1,
+    right: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+  },
+
   mapPlaceholderText: { color: "#999", fontSize: 12 },
   searchBar: {
     position: "absolute",

@@ -51,6 +51,7 @@ export default function IssuesMap() {
   return (
     <MapView
       style={StyleSheet.absoluteFillObject}
+      showsCompass={false}
       initialRegion={{
         latitude: 27.6935,
         longitude: 85.282,
