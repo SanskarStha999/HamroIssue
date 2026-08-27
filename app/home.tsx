@@ -11,43 +11,8 @@ import {
   View,
 } from "react-native";
 import IssuesMap from "../components/IssuesMap";
+import { issues, statusColors } from "../constants/issues";
 import { useNotifications } from "../context/NotificationsContext";
-
-const issues = [
-  {
-    id: "1",
-    title: "Deep Pothole on Main road",
-    location: "Kalanki road, Kathmandu",
-    status: "Pending",
-    category: "Potholes",
-    upvotes: 33,
-    image: require("../assets/images/pothhole.jpg"),
-  },
-  {
-    id: "2",
-    title: "Broken Street Light",
-    location: "Kalanki road, Kathmandu",
-    status: "In Progress",
-    category: "Streetlights",
-    upvotes: 91,
-    image: require("../assets/images/brokenlight.jpg"),
-  },
-  {
-    id: "3",
-    title: "Garbage Management",
-    location: "Kalanki road, Kathmandu",
-    status: "Resolved",
-    category: "Dumping",
-    upvotes: 12,
-    image: require("../assets/images/garbage.jpg"),
-  },
-];
-
-const statusColors: Record<string, { bg: string; text: string }> = {
-  Pending: { bg: "#FDE8E8", text: "#C53030" },
-  "In Progress": { bg: "#FEF3C7", text: "#B45309" },
-  Resolved: { bg: "#DCFCE7", text: "#15803D" },
-};
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -61,15 +26,24 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <View style={styles.mapPlaceholder}>
         <IssuesMap />
-        <View style={styles.searchBar}>
+
+        <TouchableOpacity
+          style={styles.searchBar}
+          activeOpacity={0.8}
+          onPress={() => router.push("/search")}
+        >
           <Ionicons name="search" size={18} color="#888" />
-          <TextInput
-            placeholder="Search in options"
-            style={styles.searchInput}
-            placeholderTextColor="#888"
-          />
+          <View pointerEvents="none" style={{ flex: 1 }}>
+            <TextInput
+              placeholder="Search in options"
+              style={styles.searchInput}
+              placeholderTextColor="#888"
+              editable={false}
+            />
+          </View>
           <Ionicons name="mic" size={18} color="#888" />
-        </View>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.bellButton}
           onPress={() => router.push("/notifications")}
@@ -77,9 +51,7 @@ export default function HomeScreen() {
           <Ionicons name="notifications-outline" size={20} color="#333" />
           {unreadCount > 0 && (
             <View style={styles.notificationBadge}>
-              <Text style={styles.notificationBadgeText}>
-                {unreadCount > 9 ? "9+" : unreadCount}
-              </Text>
+              <Text style={styles.notificationBadgeText}>{unreadCount}</Text>
             </View>
           )}
         </TouchableOpacity>
