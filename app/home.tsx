@@ -17,6 +17,7 @@ const issues = [
     title: "Deep Pothole on Main road",
     location: "Kalanki road, Kathmandu",
     status: "Pending",
+    category: "Potholes",
     upvotes: 33,
     image: require("../assets/images/pothhole.jpg"),
   },
@@ -25,15 +26,16 @@ const issues = [
     title: "Broken Street Light",
     location: "Kalanki road, Kathmandu",
     status: "In Progress",
+    category: "Streetlights",
     upvotes: 91,
     image: require("../assets/images/brokenlight.jpg"),
   },
-
   {
     id: "3",
     title: "Garbage Management",
     location: "Kalanki road, Kathmandu",
     status: "Resolved",
+    category: "Dumping",
     upvotes: 12,
     image: require("../assets/images/garbage.jpg"),
   },
@@ -47,6 +49,8 @@ const statusColors: Record<string, { bg: string; text: string }> = {
 
 export default function HomeScreen() {
   const [tab, setTab] = React.useState("All");
+  const filteredIssues =
+    tab === "All" ? issues : issues.filter((issue) => issue.category === tab);
 
   return (
     <View style={styles.container}>
@@ -96,7 +100,7 @@ export default function HomeScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 80 }}
         >
-          {issues.map((issue) => (
+          {filteredIssues.map((issue) => (
             <View key={issue.id} style={styles.issueCard}>
               <Image source={issue.image} style={styles.issueImage} />
               <View style={styles.issueInfo}>
