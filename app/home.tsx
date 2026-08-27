@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   Image,
@@ -10,6 +11,7 @@ import {
   View,
 } from "react-native";
 import IssuesMap from "../components/IssuesMap";
+import { useNotifications } from "../context/NotificationsContext";
 
 const issues = [
   {
@@ -48,13 +50,15 @@ const statusColors: Record<string, { bg: string; text: string }> = {
 };
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [tab, setTab] = React.useState("All");
+  const { unreadCount } = useNotifications();
+
   const filteredIssues =
     tab === "All" ? issues : issues.filter((issue) => issue.category === tab);
 
   return (
     <View style={styles.container}>
-      {/* Map placeholder */}
       <View style={styles.mapPlaceholder}>
         <IssuesMap />
         <View style={styles.searchBar}>
@@ -66,12 +70,21 @@ export default function HomeScreen() {
           />
           <Ionicons name="mic" size={18} color="#888" />
         </View>
-        <TouchableOpacity style={styles.bellButton}>
+        <TouchableOpacity
+          style={styles.bellButton}
+          onPress={() => router.push("/notifications")}
+        >
           <Ionicons name="notifications-outline" size={20} color="#333" />
+          {unreadCount > 0 && (
+            <View style={styles.notificationBadge}>
+              <Text style={styles.notificationBadgeText}>
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 
-      {/* Bottom sheet */}
       <View style={styles.sheet}>
         <View style={styles.sheetHandle} />
 
@@ -139,7 +152,6 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Bottom nav */}
       <View style={styles.bottomNav}>
         <NavItem icon="home" label="Home" active />
         <NavItem icon="document-text-outline" label="My Reports" />
@@ -178,25 +190,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingBottom: 20,
   },
-
-  compassBadge: {
-    position: "absolute",
-    top: 1,
-    right: 20,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    shadowOffset: { width: 0, height: 1 },
-  },
-
-  mapPlaceholderText: { color: "#999", fontSize: 12 },
   searchBar: {
     position: "absolute",
     top: 65,
@@ -230,6 +223,21 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 3,
   },
+  notificationBadge: {
+    position: "absolute",
+    top: -4,
+    right: -4,
+    backgroundColor: "#E53E3E",
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    paddingHorizontal: 4,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1.5,
+    borderColor: "#fff",
+  },
+  notificationBadgeText: { color: "#fff", fontSize: 10, fontWeight: "700" },
   sheet: {
     flex: 1,
     backgroundColor: "#fff",
