@@ -26,6 +26,34 @@ export const issues = [
     upvotes: 12,
     image: require("../assets/images/garbage.jpg"),
   },
+
+  {
+    id: "4",
+    title: "Streetlight Not Working",
+    location: "Satdobato, Kathmandu",
+    status: "Pending",
+    category: "Streetlights",
+    upvotes: 27,
+    image: require("../assets/images/brokenlight.jpg"),
+  },
+  {
+    id: "5",
+    title: "Garbage Management",
+    location: "Kalanki road, Kathmandu",
+    status: "Resolved",
+    category: "Dumping",
+    upvotes: 12,
+    image: require("../assets/images/garbage.jpg"),
+  },
+  {
+    id: "6",
+    title: "Illegal Waste Dumping",
+    location: "Ring Road, Kathmandu",
+    status: "Resolved",
+    category: "Dumping",
+    upvotes: 45,
+    image: require("../assets/images/garbage.jpg"),
+  },
 ];
 
 export const statusColors: Record<string, { bg: string; text: string }> = {
