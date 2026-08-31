@@ -137,7 +137,7 @@ export default function HomeScreen() {
         <NavItem icon="home" label="Home" active />
         <NavItem icon="document-text-outline" label="My Reports" />
         <NavItem icon="map-outline" label="Maps" />
-        <NavItem icon="person-outline" label="Profile" />
+        <NavItem icon="person-outline" label="Profile" onPress={() => router.push("/profile")} />
       </View>
     </View>
   );
@@ -147,13 +147,15 @@ function NavItem({
   icon,
   label,
   active,
+  onPress,
 }: {
   icon: any;
   label: string;
   active?: boolean;
+  onPress?: () => void;
 }) {
   return (
-    <TouchableOpacity style={styles.navItem}>
+    <TouchableOpacity style={styles.navItem} onPress={onPress}>
       <Ionicons name={icon} size={22} color={active ? "#4B2FE0" : "#999"} />
       <Text style={[styles.navLabel, active && styles.navLabelActive]}>
         {label}
