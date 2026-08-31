@@ -1,9 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
+import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useMemo, useRef } from "react";
 import {
   Image,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -18,6 +18,8 @@ export default function HomeScreen() {
   const router = useRouter();
   const [tab, setTab] = React.useState("All");
   const { unreadCount } = useNotifications();
+  const sheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ["48%", "92%"], []);
 
   const filteredIssues =
     tab === "All" ? issues : issues.filter((issue) => issue.category === tab);
@@ -26,7 +28,6 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <View style={styles.mapPlaceholder}>
         <IssuesMap />
-
         <TouchableOpacity
           style={styles.searchBar}
           activeOpacity={0.8}
@@ -43,7 +44,6 @@ export default function HomeScreen() {
           </View>
           <Ionicons name="mic" size={18} color="#888" />
         </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.bellButton}
           onPress={() => router.push("/notifications")}
@@ -51,40 +51,49 @@ export default function HomeScreen() {
           <Ionicons name="notifications-outline" size={20} color="#333" />
           {unreadCount > 0 && (
             <View style={styles.notificationBadge}>
-              <Text style={styles.notificationBadgeText}>{unreadCount}</Text>
+              <Text style={styles.notificationBadgeText}>
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </Text>
             </View>
           )}
         </TouchableOpacity>
       </View>
 
-      <View style={styles.sheet}>
-        <View style={styles.sheetHandle} />
-
-        <View style={styles.sheetHeader}>
-          <Text style={styles.sheetTitle}>Nearby Issues</Text>
-          <TouchableOpacity>
-            <Text style={styles.seeAll}>See all</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.tabsRow}>
-          {["All", "Potholes", "Streetlights", "Dumping"].map((t) => (
-            <TouchableOpacity key={t} onPress={() => setTab(t)}>
-              <View style={[styles.tabPill, tab === t && styles.tabPillActive]}>
-                <Text
-                  style={[styles.tabText, tab === t && styles.tabTextActive]}
-                >
-                  {t}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <ScrollView
+      <BottomSheet
+        ref={sheetRef}
+        index={0}
+        snapPoints={snapPoints}
+        enableDynamicSizing={false}
+        handleIndicatorStyle={styles.sheetHandle}
+        backgroundStyle={styles.sheetBackground}
+      >
+        <BottomSheetScrollView
+          contentContainerStyle={styles.sheetContent}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 80 }}
         >
+          <View style={styles.sheetHeader}>
+            <Text style={styles.sheetTitle}>Nearby Issues</Text>
+            <TouchableOpacity>
+              <Text style={styles.seeAll}>See all</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.tabsRow}>
+            {["All", "Potholes", "Streetlights", "Dumping"].map((t) => (
+              <TouchableOpacity key={t} onPress={() => setTab(t)}>
+                <View
+                  style={[styles.tabPill, tab === t && styles.tabPillActive]}
+                >
+                  <Text
+                    style={[styles.tabText, tab === t && styles.tabTextActive]}
+                  >
+                    {t}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+
           {filteredIssues.map((issue) => (
             <View key={issue.id} style={styles.issueCard}>
               <Image source={issue.image} style={styles.issueImage} />
@@ -116,13 +125,13 @@ export default function HomeScreen() {
               </View>
             </View>
           ))}
-        </ScrollView>
+        </BottomSheetScrollView>
+      </BottomSheet>
 
-        <TouchableOpacity style={styles.reportButton}>
-          <Ionicons name="add" size={18} color="#fff" />
-          <Text style={styles.reportButtonText}>Report Issue</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity style={styles.reportButton}>
+        <Ionicons name="add" size={18} color="#fff" />
+        <Text style={styles.reportButtonText}>Report Issue</Text>
+      </TouchableOpacity>
 
       <View style={styles.bottomNav}>
         <NavItem icon="home" label="Home" active />
@@ -156,11 +165,12 @@ function NavItem({
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
   mapPlaceholder: {
-    height: "48%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: "#E8ECE3",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    paddingBottom: 20,
   },
   searchBar: {
     position: "absolute",
@@ -210,23 +220,9 @@ const styles = StyleSheet.create({
     borderColor: "#fff",
   },
   notificationBadgeText: { color: "#fff", fontSize: 10, fontWeight: "700" },
-  sheet: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    marginTop: -24,
-    paddingHorizontal: 20,
-    paddingTop: 10,
-  },
-  sheetHandle: {
-    width: 40,
-    height: 4,
-    backgroundColor: "#ddd",
-    borderRadius: 2,
-    alignSelf: "center",
-    marginBottom: 12,
-  },
+  sheetHandle: { backgroundColor: "#ddd", width: 40, height: 4 },
+  sheetBackground: { borderTopLeftRadius: 24, borderTopRightRadius: 24 },
+  sheetContent: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 100 },
   sheetHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -277,7 +273,7 @@ const styles = StyleSheet.create({
   upvoteText: { fontSize: 12, color: "#4B2FE0", fontWeight: "600" },
   reportButton: {
     position: "absolute",
-    bottom: 40,
+    bottom: 90,
     alignSelf: "center",
     backgroundColor: "#F5A623",
     flexDirection: "row",
@@ -290,9 +286,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 4,
+    zIndex: 10,
   },
   reportButtonText: { color: "#fff", fontWeight: "700", fontSize: 13 },
   bottomNav: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: "row",
     justifyContent: "space-around",
     paddingVertical: 10,
