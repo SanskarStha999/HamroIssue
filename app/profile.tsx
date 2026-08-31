@@ -73,6 +73,17 @@ export default function ProfileScreen() {
       },
     ]);
   };
+  const showAllAccounts = async () => {
+    const raw = await AsyncStorage.getItem("users");
+    const users = raw ? JSON.parse(raw) : [];
+    const list = users
+      .map((u: any) => `• ${u.name} (${u.identifier})`)
+      .join("\n");
+    Alert.alert(
+      `${users.length} account(s) registered`,
+      list || "No accounts yet.",
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -138,6 +149,19 @@ export default function ProfileScreen() {
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Ionicons name="log-out-outline" size={18} color="#fff" />
         <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => router.push("/accounts")}>
+        <Text
+          style={{
+            textAlign: "center",
+            color: "#999",
+            fontSize: 12,
+            marginTop: 12,
+          }}
+        >
+          Show all accounts
+        </Text>
       </TouchableOpacity>
     </View>
   );
