@@ -47,7 +47,7 @@ export const issues = [
   },
   {
     id: "6",
-    title: "Illegal Waste Dumping",
+    title: "Illegal Waste",
     location: "Ring Road, Kathmandu",
     status: "Resolved",
     category: "Dumping",
