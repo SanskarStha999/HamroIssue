@@ -88,6 +88,9 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.push("/home")}>
+          <Ionicons name="arrow-back" size={22} color="#333" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>My Profile</Text>
         <TouchableOpacity
           style={styles.headerBell}
@@ -149,6 +152,14 @@ export default function ProfileScreen() {
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Ionicons name="log-out-outline" size={18} color="#fff" />
         <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.addAccountButton}
+        onPress={() => router.push("/register")}
+      >
+        <Ionicons name="person-add-outline" size={18} color="#4B2FE0" />
+        <Text style={styles.addAccountText}>Add Account</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.push("/accounts")}>
@@ -282,4 +293,16 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   logoutText: { color: "#fff", fontWeight: "700", fontSize: 14 },
+  addAccountButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    borderWidth: 1.5,
+    borderColor: "#4B2FE0",
+    borderRadius: 24,
+    paddingVertical: 12,
+    marginTop: 12,
+  },
+  addAccountText: { color: "#4B2FE0", fontWeight: "700", fontSize: 14 },
 });
