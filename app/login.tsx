@@ -33,6 +33,7 @@ export default function LoginScreen() {
       );
 
       if (match) {
+        await AsyncStorage.setItem("currentUser", JSON.stringify(match));
         router.replace("/home");
       } else {
         Alert.alert("Login failed", "Incorrect phone/email or password.");
