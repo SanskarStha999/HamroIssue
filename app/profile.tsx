@@ -4,12 +4,12 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useNotifications } from "../context/NotificationsContext";
 
@@ -131,20 +131,20 @@ export default function ProfileScreen() {
 
       <View style={styles.contributionsRow}>
         <Ionicons name="ribbon" size={16} color="#F5A623" />
-        <Text style={styles.contributionsText}>27 Contributions</Text>
+        <Text style={styles.contributionsText}>0 Contributions</Text>
       </View>
 
       <View style={styles.statsRow}>
         <View style={styles.statBox}>
-          <Text style={[styles.statNumber, { color: "#4B2FE0" }]}>12</Text>
+          <Text style={[styles.statNumber, { color: "#4B2FE0" }]}>0</Text>
           <Text style={styles.statLabel}>Reported</Text>
         </View>
         <View style={styles.statBox}>
-          <Text style={[styles.statNumber, { color: "#C53030" }]}>9</Text>
+          <Text style={[styles.statNumber, { color: "#C53030" }]}>0</Text>
           <Text style={styles.statLabel}>Pending</Text>
         </View>
         <View style={styles.statBox}>
-          <Text style={[styles.statNumber, { color: "#15803D" }]}>6</Text>
+          <Text style={[styles.statNumber, { color: "#15803D" }]}>0</Text>
           <Text style={styles.statLabel}>Resolved</Text>
         </View>
       </View>
