@@ -95,7 +95,16 @@ export default function HomeScreen() {
           </View>
 
           {filteredIssues.map((issue) => (
-            <View key={issue.id} style={styles.issueCard}>
+            <TouchableOpacity
+              key={issue.id}
+              style={styles.issueCard}
+              onPress={() =>
+                router.push({
+                  pathname: "/issue/[id]",
+                  params: { id: issue.id },
+                })
+              }
+            >
               <Image source={issue.image} style={styles.issueImage} />
               <View style={styles.issueInfo}>
                 <Text style={styles.issueTitle}>{issue.title}</Text>
@@ -123,7 +132,7 @@ export default function HomeScreen() {
                 <Ionicons name="thumbs-up" size={12} color="#4B2FE0" />
                 <Text style={styles.upvoteText}>{issue.upvotes}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </BottomSheetScrollView>
       </BottomSheet>
