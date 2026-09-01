@@ -13,11 +13,13 @@ import {
 import IssuesMap from "../components/IssuesMap";
 import { issues, statusColors } from "../constants/issues";
 import { useNotifications } from "../context/NotificationsContext";
+import { useVotes } from "../context/VotesContext";
 
 export default function HomeScreen() {
   const router = useRouter();
   const [tab, setTab] = React.useState("All");
   const { unreadCount } = useNotifications();
+  const { isVoted } = useVotes();
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["48%", "92%"], []);
 
@@ -129,8 +131,19 @@ export default function HomeScreen() {
                 </View>
               </View>
               <View style={styles.upvoteBox}>
-                <Ionicons name="thumbs-up" size={12} color="#4B2FE0" />
-                <Text style={styles.upvoteText}>{issue.upvotes}</Text>
+                <Ionicons
+                  name="thumbs-up"
+                  size={12}
+                  color={isVoted(issue.id) ? "#F5A623" : "#4B2FE0"}
+                />
+                <Text
+                  style={[
+                    styles.upvoteText,
+                    isVoted(issue.id) && { color: "#F5A623" },
+                  ]}
+                >
+                  {issue.upvotes + (isVoted(issue.id) ? 1 : 0)}
+                </Text>
               </View>
             </TouchableOpacity>
           ))}
