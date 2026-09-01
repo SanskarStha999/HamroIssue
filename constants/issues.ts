@@ -7,7 +7,8 @@ export const issues = [
     category: "Potholes",
     upvotes: 33,
     date: "Aug 12, 2026",
-    description: "A large pothole has formed on the main road near Kalanki, roughly 2 feet wide. Vehicles are swerving to avoid it, creating a traffic hazard, especially during peak hours and at night.",
+    description:
+      "A large pothole has formed on the main road near Kalanki, roughly 2 feet wide. Vehicles are swerving to avoid it, creating a traffic hazard, especially during peak hours and at night.",
     latitude: 27.6939,
     longitude: 85.282,
     image: require("../assets/images/pothhole.jpg"),
@@ -20,10 +21,11 @@ export const issues = [
     category: "Potholes",
     upvotes: 18,
     date: "Aug 20, 2026",
-    description: "Multiple cracks have appeared in the road surface near the bus stop, making it uncomfortable and risky for both pedestrians and vehicles.",
+    description:
+      "Multiple cracks have appeared in the road surface near the bus stop, making it uncomfortable and risky for both pedestrians and vehicles.",
     latitude: 27.6942,
     longitude: 85.2815,
-    image: require("../assets/images/pothhole.jpg"),
+    image: require("../assets/images/pothhole2.jpg"),
   },
   {
     id: "3",
@@ -33,7 +35,8 @@ export const issues = [
     category: "Streetlights",
     upvotes: 91,
     date: "Aug 5, 2026",
-    description: "The street light at this junction has been broken for over a week, leaving the area dark and unsafe for pedestrians at night.",
+    description:
+      "The street light at this junction has been broken for over a week, leaving the area dark and unsafe for pedestrians at night.",
     latitude: 27.6945,
     longitude: 85.2836,
     image: require("../assets/images/brokenlight.jpg"),
@@ -46,10 +49,11 @@ export const issues = [
     category: "Streetlights",
     upvotes: 27,
     date: "Aug 25, 2026",
-    description: "This streetlight has stopped working, reducing visibility along a busy stretch of road used heavily by commuters in the evening.",
+    description:
+      "This streetlight has stopped working, reducing visibility along a busy stretch of road used heavily by commuters in the evening.",
     latitude: 27.6688,
     longitude: 85.3247,
-    image: require("../assets/images/brokenlight.jpg"),
+    image: require("../assets/images/streetlight2.jpg"),
   },
   {
     id: "5",
@@ -59,7 +63,8 @@ export const issues = [
     category: "Dumping",
     upvotes: 12,
     date: "Jul 30, 2026",
-    description: "Uncollected garbage had been piling up at this spot for several days. The municipal cleaning crew has since cleared the area and set up a proper collection schedule.",
+    description:
+      "Uncollected garbage had been piling up at this spot for several days. The municipal cleaning crew has since cleared the area and set up a proper collection schedule.",
     latitude: 27.6928,
     longitude: 85.2808,
     image: require("../assets/images/garbage.jpg"),
@@ -72,10 +77,11 @@ export const issues = [
     category: "Dumping",
     upvotes: 45,
     date: "Aug 27, 2026",
-    description: "Waste is being illegally dumped along the roadside near Ring Road, creating a health hazard and unpleasant smell for nearby residents.",
+    description:
+      "Waste is being illegally dumped along the roadside near Ring Road, creating a health hazard and unpleasant smell for nearby residents.",
     latitude: 27.6905,
     longitude: 85.2865,
-    image: require("../assets/images/garbage.jpg"),
+    image: require("../assets/images/garbage2.jpg"),
   },
 ];
 
