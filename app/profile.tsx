@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -12,12 +13,24 @@ import {
   View,
 } from "react-native";
 import { useNotifications } from "../context/NotificationsContext";
+import { useReports } from "../context/ReportsContext";
 
 type CurrentUser = { name: string; identifier: string };
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { unreadCount } = useNotifications();
+  const { reports, refresh } = useReports();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      refresh();
+    }, []),
+  );
+
+  const reportedCount = reports.length;
+  const pendingCount = reports.filter((r) => r.status === "Pending").length;
+  const resolvedCount = reports.filter((r) => r.status === "Resolved").length;
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [avatarUri, setAvatarUri] = useState<string | null>(null);
 
@@ -88,7 +101,7 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.push("/home")}>
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={22} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Profile</Text>

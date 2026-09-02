@@ -54,11 +54,15 @@ type NotificationsContextValue = {
   markOneRead: (id: string) => void;
 };
 
-const NotificationsContext = createContext<NotificationsContextValue | undefined>(
-  undefined
-);
+const NotificationsContext = createContext<
+  NotificationsContextValue | undefined
+>(undefined);
 
-export function NotificationsProvider({ children }: { children: React.ReactNode }) {
+export function NotificationsProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [items, setItems] = useState<NotificationItem[]>(initialNotifications);
 
   const markAllRead = () => {
@@ -66,13 +70,17 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   };
 
   const markOneRead = (id: string) => {
-    setItems((prev) => prev.map((n) => (n.id === id ? { ...n, unread: false } : n)));
+    setItems((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, unread: false } : n)),
+    );
   };
 
   const unreadCount = items.filter((n) => n.unread).length;
 
   return (
-    <NotificationsContext.Provider value={{ items, unreadCount, markAllRead, markOneRead }}>
+    <NotificationsContext.Provider
+      value={{ items, unreadCount, markAllRead, markOneRead }}
+    >
       {children}
     </NotificationsContext.Provider>
   );
@@ -81,7 +89,9 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
 export function useNotifications() {
   const ctx = useContext(NotificationsContext);
   if (!ctx) {
-    throw new Error("useNotifications must be used inside NotificationsProvider");
+    throw new Error(
+      "useNotifications must be used inside NotificationsProvider",
+    );
   }
   return ctx;
 }

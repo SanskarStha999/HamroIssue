@@ -157,7 +157,7 @@ export default function HomeScreen() {
 
       <View style={styles.bottomNav}>
         <NavItem icon="home" label="Home" active />
-        <NavItem icon="document-text-outline" label="My Reports" />
+        <NavItem icon="document-text-outline" label="My Reports" onPress={() => router.push("/my-reports")} />
         <NavItem
           icon="map-outline"
           label="Maps"
