@@ -150,7 +150,7 @@ export default function HomeScreen() {
         </BottomSheetScrollView>
       </BottomSheet>
 
-      <TouchableOpacity style={styles.reportButton}>
+      <TouchableOpacity style={styles.reportButton} onPress={() => router.push("/report")}>
         <Ionicons name="add" size={18} color="#fff" />
         <Text style={styles.reportButtonText}>Report Issue</Text>
       </TouchableOpacity>
