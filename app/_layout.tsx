@@ -1,8 +1,9 @@
-import { Stack } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { NotificationsProvider } from "../context/NotificationsContext";
-import { ReportsProvider } from "../context/ReportsContext";
-import { VotesProvider } from "../context/VotesContext";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Stack } from 'expo-router';
+import { NotificationsProvider } from '../context/NotificationsContext';
+import { VotesProvider } from '../context/VotesContext';
+import { ReportsProvider } from '../context/ReportsContext';
+import { LocationPickerProvider } from '../context/LocationPickerContext';
 
 export default function RootLayout() {
   return (
@@ -10,10 +11,12 @@ export default function RootLayout() {
       <NotificationsProvider>
         <VotesProvider>
           <ReportsProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="login" />
-            </Stack>
+            <LocationPickerProvider>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="login" />
+              </Stack>
+            </LocationPickerProvider>
           </ReportsProvider>
         </VotesProvider>
       </NotificationsProvider>

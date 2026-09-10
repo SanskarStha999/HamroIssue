@@ -144,24 +144,31 @@ export default function ProfileScreen() {
 
       <View style={styles.contributionsRow}>
         <Ionicons name="ribbon" size={16} color="#F5A623" />
-        <Text style={styles.contributionsText}>0 Contributions</Text>
+        <Text style={styles.contributionsText}>
+          {reportedCount} Contributions
+        </Text>
       </View>
 
       <View style={styles.statsRow}>
         <View style={styles.statBox}>
-          <Text style={[styles.statNumber, { color: "#4B2FE0" }]}>0</Text>
+          <Text style={[styles.statNumber, { color: "#4B2FE0" }]}>
+            {reportedCount}
+          </Text>
           <Text style={styles.statLabel}>Reported</Text>
         </View>
         <View style={styles.statBox}>
-          <Text style={[styles.statNumber, { color: "#C53030" }]}>0</Text>
+          <Text style={[styles.statNumber, { color: "#C53030" }]}>
+            {pendingCount}
+          </Text>
           <Text style={styles.statLabel}>Pending</Text>
         </View>
         <View style={styles.statBox}>
-          <Text style={[styles.statNumber, { color: "#15803D" }]}>0</Text>
+          <Text style={[styles.statNumber, { color: "#15803D" }]}>
+            {resolvedCount}
+          </Text>
           <Text style={styles.statLabel}>Resolved</Text>
         </View>
       </View>
-
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Ionicons name="log-out-outline" size={18} color="#fff" />
         <Text style={styles.logoutText}>Logout</Text>

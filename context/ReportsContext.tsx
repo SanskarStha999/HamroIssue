@@ -7,21 +7,24 @@ export type MyReport = {
   status: "Pending" | "In Progress" | "Resolved";
   category: "Potholes" | "Streetlights" | "Dumping";
   location: string;
+  description: string;
   date: string;
   upvotes: number;
   image: any;
+  latitude?: number;
+  longitude?: number;
 };
 
 type ReportsContextValue = {
   reports: MyReport[];
   refresh: () => Promise<void>;
   addReport: (report: MyReport) => Promise<void>;
+  updateReport: (report: MyReport) => Promise<void>;
+  deleteReport: (id: string) => Promise<void>;
   clearReports: () => Promise<void>;
 };
 
-const ReportsContext = createContext<ReportsContextValue | undefined>(
-  undefined,
-);
+const ReportsContext = createContext<ReportsContextValue | undefined>(undefined);
 
 export function ReportsProvider({ children }: { children: React.ReactNode }) {
   const [reports, setReports] = useState<MyReport[]>([]);
@@ -44,12 +47,32 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
     const raw = await AsyncStorage.getItem(`myReports:${identifier}`);
     const existing: MyReport[] = raw ? JSON.parse(raw) : [];
     const updated = [report, ...existing];
-    await AsyncStorage.setItem(
-      `myReports:${identifier}`,
-      JSON.stringify(updated),
-    );
+    await AsyncStorage.setItem(`myReports:${identifier}`, JSON.stringify(updated));
     setReports(updated);
   };
+
+  const updateReport = async (updatedReport: MyReport) => {
+    const currentRaw = await AsyncStorage.getItem("currentUser");
+    if (!currentRaw) return;
+    const { identifier } = JSON.parse(currentRaw);
+    const raw = await AsyncStorage.getItem(`myReports:${identifier}`);
+    const existing: MyReport[] = raw ? JSON.parse(raw) : [];
+    const updated = existing.map((r) => (r.id === updatedReport.id ? updatedReport : r));
+    await AsyncStorage.setItem(`myReports:${identifier}`, JSON.stringify(updated));
+    setReports(updated);
+  };
+
+  const deleteReport = async (id: string) => {
+    const currentRaw = await AsyncStorage.getItem("currentUser");
+    if (!currentRaw) return;
+    const { identifier } = JSON.parse(currentRaw);
+    const raw = await AsyncStorage.getItem(`myReports:${identifier}`);
+    const existing: MyReport[] = raw ? JSON.parse(raw) : [];
+    const updated = existing.filter((r) => r.id !== id);
+    await AsyncStorage.setItem(`myReports:${identifier}`, JSON.stringify(updated));
+    setReports(updated);
+  };
+
   const clearReports = async () => {
     const currentRaw = await AsyncStorage.getItem("currentUser");
     if (!currentRaw) return;
@@ -59,9 +82,7 @@ export function ReportsProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <ReportsContext.Provider
-      value={{ reports, refresh, addReport, clearReports }}
-    >
+    <ReportsContext.Provider value={{ reports, refresh, addReport, updateReport, deleteReport, clearReports }}>
       {children}
     </ReportsContext.Provider>
   );

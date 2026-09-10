@@ -3,7 +3,9 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
+  Alert,
   Image,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -29,8 +31,9 @@ const TABS = ["All", "Pending", "In Progress", "Resolved"];
 export default function MyReportsScreen() {
   const router = useRouter();
   const { unreadCount } = useNotifications();
-  const { reports, refresh, clearReports } = useReports();
+  const { reports, refresh, deleteReport } = useReports();
   const [tab, setTab] = useState("All");
+  const [menuFor, setMenuFor] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -144,6 +147,12 @@ export default function MyReportsScreen() {
                     {report.status}
                   </Text>
                 </View>
+                <TouchableOpacity
+                  style={styles.menuButton}
+                  onPress={() => setMenuFor(report.id)}
+                >
+                  <Ionicons name="ellipsis-vertical" size={16} color="#666" />
+                </TouchableOpacity>
               </View>
 
               <Image source={report.image} style={styles.cardImage} />
@@ -196,6 +205,44 @@ export default function MyReportsScreen() {
           <Text style={styles.navLabel}>Profile</Text>
         </TouchableOpacity>
       </View>
+
+      <Modal visible={!!menuFor} transparent animationType="fade">
+        <TouchableOpacity
+          style={styles.modalBackdrop}
+          activeOpacity={1}
+          onPress={() => setMenuFor(null)}
+        >
+          <View style={styles.modalCard}>
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => {
+                const id = menuFor;
+                setMenuFor(null);
+                if (id) router.push({ pathname: "/report", params: { id } });
+              }}
+            >
+              <Text style={styles.modalOptionText}>Edit Issue</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => {
+                const id = menuFor;
+                setMenuFor(null);
+                if (id) {
+                  Alert.alert("Delete report", "This can't be undone.", [
+                    { text: "Cancel", style: "cancel" },
+                    { text: "Delete", style: "destructive", onPress: () => deleteReport(id) },
+                  ]);
+                }
+              }}
+            >
+              <Text style={[styles.modalOptionText, { color: "#C53030" }]}>
+                Delete Issue
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -270,7 +317,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 17,
   },
-  devLink: { fontSize: 12, color: "#4B2FE0", fontWeight: "600", marginTop: 16 },
   card: {
     backgroundColor: "#fff",
     borderRadius: 16,
@@ -296,6 +342,7 @@ const styles = StyleSheet.create({
   cardCode: { fontSize: 10, color: "#aaa", marginTop: 2 },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
   statusText: { fontSize: 10, fontWeight: "600" },
+  menuButton: { padding: 4, marginLeft: 6 },
   cardImage: {
     width: "100%",
     height: 140,
@@ -324,4 +371,18 @@ const styles = StyleSheet.create({
   navItem: { alignItems: "center", gap: 2 },
   navLabel: { fontSize: 10, color: "#999" },
   navLabelActive: { color: "#4B2FE0", fontWeight: "600" },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    padding: 40,
+  },
+  modalCard: { backgroundColor: "#fff", borderRadius: 14, overflow: "hidden" },
+  modalOption: {
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F0F0F0",
+  },
+  modalOptionText: { fontSize: 14, color: "#333", fontWeight: "600" },
 });
