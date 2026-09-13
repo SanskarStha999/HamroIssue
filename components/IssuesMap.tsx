@@ -1,6 +1,6 @@
-import MapView, { Marker } from "react-native-maps";
-import { View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { StyleSheet, View } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 import { useReports } from "../context/ReportsContext";
 
 type IssueStatus = "Pending" | "In Progress" | "Resolved";
@@ -21,18 +21,45 @@ const STATUS_COLORS: Record<IssueStatus, string> = {
 };
 
 const issues: MapIssue[] = [
-  { id: "1", title: "Deep Pothole on Main road", status: "Pending", icon: "warning", latitude: 27.6939, longitude: 85.282 },
-  { id: "2", title: "Broken Street Light", status: "In Progress", icon: "bulb", latitude: 27.6945, longitude: 85.2836 },
-  { id: "3", title: "Garbage Management", status: "Resolved", icon: "trash", latitude: 27.6928, longitude: 85.2808 },
+  {
+    id: "1",
+    title: "Deep Pothole on Main road",
+    status: "Pending",
+    icon: "warning",
+    latitude: 27.6939,
+    longitude: 85.282,
+  },
+  {
+    id: "2",
+    title: "Broken Street Light",
+    status: "In Progress",
+    icon: "bulb",
+    latitude: 27.6945,
+    longitude: 85.2836,
+  },
+  {
+    id: "3",
+    title: "Garbage Management",
+    status: "Resolved",
+    icon: "trash",
+    latitude: 27.6928,
+    longitude: 85.2808,
+  },
 ];
 
-export default function IssuesMap({ showMyReports = false }: { showMyReports?: boolean }) {
+export default function IssuesMap({
+  showMyReports = false,
+}: {
+  showMyReports?: boolean;
+}) {
   const { reports } = useReports();
-  const myPinned = showMyReports ? reports.filter((r) => r.latitude && r.longitude) : [];
+  const myPinned = showMyReports
+    ? reports.filter((r) => r.latitude && r.longitude)
+    : [];
 
   return (
     <MapView
-      style={StyleSheet.absoluteFillObject}
+      style={{ flex: 1, width: "100%", height: "100%" }}
       showsCompass={false}
       initialRegion={{
         latitude: 27.6935,
@@ -47,8 +74,14 @@ export default function IssuesMap({ showMyReports = false }: { showMyReports?: b
           coordinate={{ latitude: issue.latitude, longitude: issue.longitude }}
           title={issue.title}
           description={issue.status}
+          tracksViewChanges={false}
         >
-          <View style={[styles.pin, { backgroundColor: STATUS_COLORS[issue.status] }]}>
+          <View
+            style={[
+              styles.pin,
+              { backgroundColor: STATUS_COLORS[issue.status] },
+            ]}
+          >
             <Ionicons name={issue.icon} size={16} color="#fff" />
           </View>
         </Marker>
@@ -57,12 +90,25 @@ export default function IssuesMap({ showMyReports = false }: { showMyReports?: b
       {myPinned.map((report) => (
         <Marker
           key={`my-${report.id}`}
-          coordinate={{ latitude: report.latitude!, longitude: report.longitude! }}
+          coordinate={{
+            latitude: report.latitude!,
+            longitude: report.longitude!,
+          }}
           title={report.title}
           description={`Your report · ${report.status}`}
+          tracksViewChanges={false}
         >
-          <View style={[styles.myPin, { borderColor: STATUS_COLORS[report.status] }]}>
-            <Ionicons name="person" size={14} color={STATUS_COLORS[report.status]} />
+          <View
+            style={[
+              styles.myPin,
+              { borderColor: STATUS_COLORS[report.status] },
+            ]}
+          >
+            <Ionicons
+              name="person"
+              size={14}
+              color={STATUS_COLORS[report.status]}
+            />
           </View>
         </Marker>
       ))}
@@ -71,6 +117,32 @@ export default function IssuesMap({ showMyReports = false }: { showMyReports?: b
 }
 
 const styles = StyleSheet.create({
-  pin: { width: 30, height: 30, borderRadius: 15, alignItems: "center", justifyContent: "center", borderWidth: 2, borderColor: "#fff", elevation: 4, shadowColor: "#000", shadowOpacity: 0.3, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
-  myPin: { width: 28, height: 28, borderRadius: 14, backgroundColor: "#fff", alignItems: "center", justifyContent: "center", borderWidth: 2.5, elevation: 4, shadowColor: "#000", shadowOpacity: 0.3, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
+  pin: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#fff",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+  },
+  myPin: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2.5,
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+  },
 });
