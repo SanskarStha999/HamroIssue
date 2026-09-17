@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "expo-router/react-navigation";
 import { useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
+import { useFocusEffect } from "expo-router/react-navigation";
+import { useCallback, useState } from "react";
 import {
   Alert,
   Image,
@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { statusColors } from "../constants/issues";
 import { useNotifications } from "../context/NotificationsContext";
-import { MyReport, useReports } from "../context/ReportsContext";
+import { useReports } from "../context/ReportsContext";
 
 const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   Potholes: "warning",
@@ -177,10 +177,7 @@ export default function MyReportsScreen() {
       </ScrollView>
 
       <View style={styles.bottomNav}>
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.back()}
-        >
+        <TouchableOpacity style={styles.navItem} onPress={() => router.back()}>
           <Ionicons name="home-outline" size={22} color="#999" />
           <Text style={styles.navLabel}>Home</Text>
         </TouchableOpacity>
@@ -218,6 +215,17 @@ export default function MyReportsScreen() {
               onPress={() => {
                 const id = menuFor;
                 setMenuFor(null);
+                if (id)
+                  router.push({ pathname: "/my-report/[id]", params: { id } });
+              }}
+            >
+              <Text style={styles.modalOptionText}>View Details</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => {
+                const id = menuFor;
+                setMenuFor(null);
                 if (id) router.push({ pathname: "/report", params: { id } });
               }}
             >
@@ -231,7 +239,11 @@ export default function MyReportsScreen() {
                 if (id) {
                   Alert.alert("Delete report", "This can't be undone.", [
                     { text: "Cancel", style: "cancel" },
-                    { text: "Delete", style: "destructive", onPress: () => deleteReport(id) },
+                    {
+                      text: "Delete",
+                      style: "destructive",
+                      onPress: () => deleteReport(id),
+                    },
                   ]);
                 }
               }}

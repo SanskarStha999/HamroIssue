@@ -1,85 +1,92 @@
-// context/NotificationsContext.tsx
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useState } from "react";
 
 export type NotificationItem = {
   id: string;
-  type: "review" | "support" | "progress";
+  type: "review" | "support" | "progress" | "welcome" | "report";
   title: string;
   description: string;
   time: string;
   unread: boolean;
 };
 
-const initialNotifications: NotificationItem[] = [
-  {
-    id: "1",
-    type: "review",
-    title: "Authority Review",
-    description:
-      "Your report on Satdobato road has been reviewed and approved by the ward office.",
-    time: "2m ago",
-    unread: true,
-  },
-  {
-    id: "2",
-    type: "support",
-    title: "Community Support",
-    description: "Someone liked your report on Satdobato road.",
-    time: "8m ago",
-    unread: true,
-  },
-  {
-    id: "3",
-    type: "progress",
-    title: "Work in progress",
-    description:
-      "Maintenance team has been dispatched to Satdobato road to begin repairs.",
-    time: "21h ago",
-    unread: false,
-  },
-  {
-    id: "4",
-    type: "support",
-    title: "Community Support",
-    description: "Someone liked your report on Satdobato road.",
-    time: "2d ago",
-    unread: false,
-  },
-];
-
 type NotificationsContextValue = {
   items: NotificationItem[];
   unreadCount: number;
-  markAllRead: () => void;
-  markOneRead: (id: string) => void;
+  refresh: () => Promise<void>;
+  markAllRead: () => Promise<void>;
+  markOneRead: (id: string) => Promise<void>;
+  addNotification: (
+    title: string,
+    description: string,
+    type: NotificationItem["type"]
+  ) => Promise<void>;
 };
 
-const NotificationsContext = createContext<
-  NotificationsContextValue | undefined
->(undefined);
+const NotificationsContext = createContext<NotificationsContextValue | undefined>(
+  undefined
+);
 
-export function NotificationsProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [items, setItems] = useState<NotificationItem[]>(initialNotifications);
+export function NotificationsProvider({ children }: { children: React.ReactNode }) {
+  const [items, setItems] = useState<NotificationItem[]>([]);
 
-  const markAllRead = () => {
-    setItems((prev) => prev.map((n) => ({ ...n, unread: false })));
+  const refresh = async () => {
+    const currentRaw = await AsyncStorage.getItem("currentUser");
+    if (!currentRaw) {
+      setItems([]);
+      return;
+    }
+    const { identifier } = JSON.parse(currentRaw);
+    const raw = await AsyncStorage.getItem(`notifications:${identifier}`);
+    setItems(raw ? JSON.parse(raw) : []);
   };
 
-  const markOneRead = (id: string) => {
-    setItems((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, unread: false } : n)),
-    );
+  const addNotification = async (
+    title: string,
+    description: string,
+    type: NotificationItem["type"]
+  ) => {
+    const currentRaw = await AsyncStorage.getItem("currentUser");
+    if (!currentRaw) return;
+    const { identifier } = JSON.parse(currentRaw);
+    const raw = await AsyncStorage.getItem(`notifications:${identifier}`);
+    const existing: NotificationItem[] = raw ? JSON.parse(raw) : [];
+    const newNotification: NotificationItem = {
+      id: Date.now().toString(),
+      type,
+      title,
+      description,
+      time: "Just now",
+      unread: true,
+    };
+    const updated = [newNotification, ...existing];
+    await AsyncStorage.setItem(`notifications:${identifier}`, JSON.stringify(updated));
+    setItems(updated);
+  };
+
+  const markAllRead = async () => {
+    const currentRaw = await AsyncStorage.getItem("currentUser");
+    if (!currentRaw) return;
+    const { identifier } = JSON.parse(currentRaw);
+    const updated = items.map((n) => ({ ...n, unread: false }));
+    await AsyncStorage.setItem(`notifications:${identifier}`, JSON.stringify(updated));
+    setItems(updated);
+  };
+
+  const markOneRead = async (id: string) => {
+    const currentRaw = await AsyncStorage.getItem("currentUser");
+    if (!currentRaw) return;
+    const { identifier } = JSON.parse(currentRaw);
+    const updated = items.map((n) => (n.id === id ? { ...n, unread: false } : n));
+    await AsyncStorage.setItem(`notifications:${identifier}`, JSON.stringify(updated));
+    setItems(updated);
   };
 
   const unreadCount = items.filter((n) => n.unread).length;
 
   return (
     <NotificationsContext.Provider
-      value={{ items, unreadCount, markAllRead, markOneRead }}
+      value={{ items, unreadCount, refresh, markAllRead, markOneRead, addNotification }}
     >
       {children}
     </NotificationsContext.Provider>
@@ -88,10 +95,6 @@ export function NotificationsProvider({
 
 export function useNotifications() {
   const ctx = useContext(NotificationsContext);
-  if (!ctx) {
-    throw new Error(
-      "useNotifications must be used inside NotificationsProvider",
-    );
-  }
+  if (!ctx) throw new Error("useNotifications must be used inside NotificationsProvider");
   return ctx;
 }

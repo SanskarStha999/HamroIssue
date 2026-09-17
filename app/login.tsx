@@ -13,10 +13,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useNotifications } from "../context/NotificationsContext";
 
 export default function LoginScreen() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const { addNotification } = useNotifications();
 
   const handleLogin = async () => {
     if (!identifier || !password) {
@@ -34,6 +36,11 @@ export default function LoginScreen() {
 
       if (match) {
         await AsyncStorage.setItem("currentUser", JSON.stringify(match));
+        await addNotification(
+          "Welcome!",
+          `Good to see you, ${match.name}. Explore nearby issues and start making a difference.`,
+          "welcome"
+        );
         router.replace("/home");
       } else {
         Alert.alert("Login failed", "Incorrect phone/email or password.");

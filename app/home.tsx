@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "expo-router/react-navigation";
 import React, { useMemo, useRef } from "react";
 import {
   Image,
@@ -18,7 +19,12 @@ import { useVotes } from "../context/VotesContext";
 export default function HomeScreen() {
   const router = useRouter();
   const [tab, setTab] = React.useState("All");
-  const { unreadCount } = useNotifications();
+  const { unreadCount, refresh: refreshNotifications } = useNotifications();
+  useFocusEffect(
+    React.useCallback(() => {
+      refreshNotifications();
+    }, []),
+  );
   const { isVoted } = useVotes();
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["48%", "92%"], []);
@@ -150,14 +156,21 @@ export default function HomeScreen() {
         </BottomSheetScrollView>
       </BottomSheet>
 
-      <TouchableOpacity style={styles.reportButton} onPress={() => router.push("/report")}>
+      <TouchableOpacity
+        style={styles.reportButton}
+        onPress={() => router.push("/report")}
+      >
         <Ionicons name="add" size={18} color="#fff" />
         <Text style={styles.reportButtonText}>Report Issue</Text>
       </TouchableOpacity>
 
       <View style={styles.bottomNav}>
         <NavItem icon="home" label="Home" active />
-        <NavItem icon="document-text-outline" label="My Reports" onPress={() => router.push("/my-reports")} />
+        <NavItem
+          icon="document-text-outline"
+          label="My Reports"
+          onPress={() => router.push("/my-reports")}
+        />
         <NavItem
           icon="map-outline"
           label="Maps"

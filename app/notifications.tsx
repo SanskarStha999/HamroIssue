@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "expo-router/react-navigation";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useCallback } from "react";
 import {
   FlatList,
   StyleSheet,
@@ -14,11 +15,18 @@ const ICONS = {
   review: { name: "checkmark-circle", bg: "#3B4CCA" },
   support: { name: "thumbs-up", bg: "#F5A623" },
   progress: { name: "construct", bg: "#8B95A5" },
+  welcome: { name: "hand-left", bg: "#4B2FE0" },
+  report: { name: "document-text", bg: "#22C55E" },
 } as const;
-
 export default function NotificationsScreen() {
   const router = useRouter();
-  const { items, markAllRead, markOneRead } = useNotifications();
+  const { items, refresh, markAllRead, markOneRead } = useNotifications();
+
+  useFocusEffect(
+    useCallback(() => {
+      refresh();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
@@ -38,33 +46,53 @@ export default function NotificationsScreen() {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 20 }}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[styles.row, item.unread && styles.rowUnread]}
-            onPress={() => markOneRead(item.id)}
-          >
-            <View style={[styles.iconCircle, { backgroundColor: ICONS[item.type].bg }]}>
-              <Ionicons name={ICONS[item.type].name} size={18} color="#fff" />
-            </View>
-            <View style={styles.textBlock}>
-              <View style={styles.rowTop}>
-                <Text style={styles.itemTitle}>{item.title}</Text>
-                <View style={styles.timeRow}>
-                  <Text style={styles.time}>{item.time}</Text>
-                  {item.unread && <View style={styles.dot} />}
-                </View>
+      {items.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Ionicons name="notifications-off-outline" size={40} color="#ccc" />
+          <Text style={styles.emptyTitle}>No notifications yet</Text>
+          <Text style={styles.emptySubtitle}>
+            You'll see updates here as things happen — logging in, submitting a
+            report, and more.
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[styles.row, item.unread && styles.rowUnread]}
+              onPress={() => markOneRead(item.id)}
+            >
+              <View
+                style={[
+                  styles.iconCircle,
+                  { backgroundColor: ICONS[item.type]?.bg ?? "#8B95A5" },
+                ]}
+              >
+                <Ionicons
+                  name={ICONS[item.type]?.name ?? "notifications"}
+                  size={18}
+                  color="#fff"
+                />
               </View>
-              <Text style={styles.description} numberOfLines={1}>
-                {item.description}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        )}
-      />
+              <View style={styles.textBlock}>
+                <View style={styles.rowTop}>
+                  <Text style={styles.itemTitle}>{item.title}</Text>
+                  <View style={styles.timeRow}>
+                    <Text style={styles.time}>{item.time}</Text>
+                    {item.unread && <View style={styles.dot} />}
+                  </View>
+                </View>
+                <Text style={styles.description} numberOfLines={2}>
+                  {item.description}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </View>
   );
 }
@@ -76,6 +104,9 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
   title: { fontSize: 22, fontWeight: "700", color: "#1A1033" },
   markRead: { fontSize: 12, color: "#F5A623", fontWeight: "600" },
+  emptyState: { alignItems: "center", marginTop: 60, gap: 6, paddingHorizontal: 20 },
+  emptyTitle: { fontSize: 15, fontWeight: "700", color: "#555" },
+  emptySubtitle: { fontSize: 12, color: "#999", textAlign: "center", lineHeight: 17 },
   row: { flexDirection: "row", alignItems: "flex-start", gap: 12, padding: 12, borderRadius: 12, marginBottom: 6 },
   rowUnread: { backgroundColor: "#EEF0FF" },
   iconCircle: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },

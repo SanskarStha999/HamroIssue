@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import * as Location from "expo-location";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -15,6 +16,7 @@ import {
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { useLocationPicker } from "../context/LocationPickerContext";
+import { useNotifications } from "../context/NotificationsContext";
 import { MyReport, useReports } from "../context/ReportsContext";
 
 const CATEGORIES: MyReport["category"][] = [
@@ -30,10 +32,30 @@ const DEFAULT_REGION = {
   longitudeDelta: 0.01,
 };
 
+async function getLocationLabel(coords: {
+  latitude: number;
+  longitude: number;
+}) {
+  try {
+    const results = await Location.reverseGeocodeAsync(coords);
+    const address = results[0];
+    if (!address) return "Kathmandu";
+    const parts = [
+      address.name,
+      address.street,
+      address.city || address.subregion || address.district,
+    ].filter((part, index, arr) => !!part && arr.indexOf(part) === index);
+    return parts.length > 0 ? parts.slice(0, 2).join(", ") : "Kathmandu";
+  } catch {
+    return "Kathmandu";
+  }
+}
+
 export default function ReportIssueScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { addReport, updateReport, reports } = useReports();
+  const { addNotification } = useNotifications();
   const { pickedLocation, setPickedLocation } = useLocationPicker();
   const isEditing = !!id;
 
@@ -59,6 +81,23 @@ export default function ReportIssueScreen() {
       }
     }
   }, [id]);
+
+  useEffect(() => {
+    if (isEditing) return;
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") return;
+      try {
+        const current = await Location.getCurrentPositionAsync({});
+        setPin({
+          latitude: current.coords.latitude,
+          longitude: current.coords.longitude,
+        });
+      } catch {
+        // Location unavailable — silently keep the default region.
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (pickedLocation) {
@@ -133,6 +172,7 @@ export default function ReportIssueScreen() {
     }
 
     setSubmitting(true);
+    const locationLabel = await getLocationLabel(pin);
 
     if (isEditing) {
       const existing = reports.find((r) => r.id === id);
@@ -144,6 +184,7 @@ export default function ReportIssueScreen() {
           image: { uri: photoUri },
           latitude: pin.latitude,
           longitude: pin.longitude,
+          location: locationLabel,
         });
       }
       setSubmitting(false);
@@ -158,7 +199,7 @@ export default function ReportIssueScreen() {
       title: `New ${category} Report`,
       status: "Pending",
       category,
-      location: "Pinned location, Kathmandu",
+      location: locationLabel,
       description,
       date: new Date().toLocaleDateString("en-US", {
         month: "short",
@@ -172,6 +213,11 @@ export default function ReportIssueScreen() {
     };
 
     await addReport(report);
+    await addNotification(
+      "Report Submitted",
+      `Your report "${report.title}" has been successfully submitted and is now pending review.`,
+      "report",
+    );
     setSubmitting(false);
     Alert.alert(
       "Report submitted",

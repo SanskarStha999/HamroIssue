@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Location from "expo-location";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MapView from "react-native-maps";
 import { useLocationPicker } from "../context/LocationPickerContext";
@@ -14,6 +15,14 @@ export default function PickLocationScreen() {
   const initialLongitude = lng ? parseFloat(lng) : 85.282;
 
   const [center, setCenter] = useState({ latitude: initialLatitude, longitude: initialLongitude });
+  const [locationEnabled, setLocationEnabled] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      setLocationEnabled(status === "granted");
+    })();
+  }, []);
 
   const handleConfirm = () => {
     setPickedLocation(center);
@@ -24,6 +33,7 @@ export default function PickLocationScreen() {
     <View style={styles.container}>
       <MapView
         style={StyleSheet.absoluteFill}
+        showsUserLocation={locationEnabled}
         initialRegion={{
           latitude: initialLatitude,
           longitude: initialLongitude,

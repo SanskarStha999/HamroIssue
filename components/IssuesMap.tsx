@@ -1,18 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Location from "expo-location";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import { issues } from "../constants/issues";
 import { useReports } from "../context/ReportsContext";
 
 type IssueStatus = "Pending" | "In Progress" | "Resolved";
-
-type MapIssue = {
-  id: string;
-  title: string;
-  status: IssueStatus;
-  icon: keyof typeof Ionicons.glyphMap;
-  latitude: number;
-  longitude: number;
-};
 
 const STATUS_COLORS: Record<IssueStatus, string> = {
   Pending: "#E53E3E",
@@ -20,32 +14,11 @@ const STATUS_COLORS: Record<IssueStatus, string> = {
   Resolved: "#22C55E",
 };
 
-const issues: MapIssue[] = [
-  {
-    id: "1",
-    title: "Deep Pothole on Main road",
-    status: "Pending",
-    icon: "warning",
-    latitude: 27.6939,
-    longitude: 85.282,
-  },
-  {
-    id: "2",
-    title: "Broken Street Light",
-    status: "In Progress",
-    icon: "bulb",
-    latitude: 27.6945,
-    longitude: 85.2836,
-  },
-  {
-    id: "3",
-    title: "Garbage Management",
-    status: "Resolved",
-    icon: "trash",
-    latitude: 27.6928,
-    longitude: 85.2808,
-  },
-];
+const CATEGORY_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  Potholes: "warning",
+  Streetlights: "bulb",
+  Dumping: "trash",
+};
 
 export default function IssuesMap({
   showMyReports = false,
@@ -56,11 +29,20 @@ export default function IssuesMap({
   const myPinned = showMyReports
     ? reports.filter((r) => r.latitude && r.longitude)
     : [];
+  const [locationEnabled, setLocationEnabled] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      setLocationEnabled(status === "granted");
+    })();
+  }, []);
 
   return (
     <MapView
       style={{ flex: 1, width: "100%", height: "100%" }}
       showsCompass={false}
+      showsUserLocation={locationEnabled}
       initialRegion={{
         latitude: 27.6935,
         longitude: 85.282,
@@ -79,10 +61,14 @@ export default function IssuesMap({
           <View
             style={[
               styles.pin,
-              { backgroundColor: STATUS_COLORS[issue.status] },
+              { backgroundColor: STATUS_COLORS[issue.status as IssueStatus] },
             ]}
           >
-            <Ionicons name={issue.icon} size={16} color="#fff" />
+            <Ionicons
+              name={CATEGORY_ICONS[issue.category] ?? "alert-circle"}
+              size={16}
+              color="#fff"
+            />
           </View>
         </Marker>
       ))}
